@@ -1,4 +1,6 @@
 #include "../include/tridiag.hh"
+#include <complex>
+#include "matrix.hh"
 
 int eval_M2_tridiag(double *T, size_t N) {
 
@@ -12,9 +14,9 @@ int eval_M2_tridiag(double *T, size_t N) {
 	return EXIT_SUCCESS;
 }
 
-int eval_D2_tridiag(double *T, double h, size_t N) {
+int eval_D2_tridiag(double *T, double h, size_t N, double coef) {
 	
-	const double val_offdiag = 1./ (h*h);
+	const double val_offdiag = coef * 1./ (h*h);
 	const double val_diag = -2. * val_offdiag;
 
 	double *pT = T+1, *pT_max = T;
@@ -34,4 +36,25 @@ int tridiag_mul_diag(double *T, double *D, double *TD, size_t N) {
 
 	return EXIT_SUCCESS;
 }
+
+
+int tridiag_forward(
+		std::complex<double> *td, 
+		std::complex<double> *v, 
+		std::complex<double> *b, size_t N) 
+{
+	return tridiag_mul_forward< std::complex<double> >(
+			td+N, td+2*N, td+3*N, v, b, N);
+}
+
+int tridiag_backward(
+		std::complex<double> *td,
+		std::complex<double> *v,
+		std::complex<double> *b, size_t N)
+{
+	return tridiag_mul_backward< std::complex<double> >(
+		 td+N, td+2*N, td+3*N, v, b, N);	
+}
+
+
 

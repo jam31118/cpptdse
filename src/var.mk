@@ -1,0 +1,5 @@
+OPT_FLAGS = -O3
+
+MATRIX_INC_FLAGS = -I$(MATRIXHOME)/include 
+MATRIX_LIB_FLAGS = -L$(MATRIXHOME)/lib -lmatrix
+
