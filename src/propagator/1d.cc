@@ -10,13 +10,13 @@
 Propagator_on_Box_1D::Propagator_on_Box_1D(
 		size_t Nx, double dx, double *Vx, double hbar, double mass): 
 	Nx(Nx), dx(dx), Vx(Vx), hbar(hbar), mass(mass) {
-	
+
 	if (dx <= 0.) { throw "[ERROR] Negative `dx` found"; }
 
 	U_forward = new std::complex<double>[3*Nx];
 	U_backward = new std::complex<double>[3*Nx];
 
-	M2 = new double[Nx];
+	M2 = new double[3*Nx];
 	eval_M2_tridiag(M2, Nx);
 
 	// Construct `M2Hreal`
