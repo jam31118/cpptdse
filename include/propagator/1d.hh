@@ -4,9 +4,6 @@
 #include <cstdlib>
 #include <complex>
 
-//#include "../tridiag.hh"
-//#include "../array.hh"
-
 class Propagator_on_Box_1D {
 
 	size_t Nx;

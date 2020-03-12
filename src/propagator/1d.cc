@@ -5,8 +5,6 @@
 #include "../../include/array.hh"
 #include "../../include/tridiag.hh"
 
-#include "matrix.hh"
-
 Propagator_on_Box_1D::Propagator_on_Box_1D(
 		size_t Nx, double dx, double *Vx, double hbar, double mass): 
 	Nx(Nx), dx(dx), Vx(Vx), hbar(hbar), mass(mass) {
@@ -36,12 +34,14 @@ Propagator_on_Box_1D::Propagator_on_Box_1D(
 	delete [] M2ReVx;
 }
 
+
 Propagator_on_Box_1D::~Propagator_on_Box_1D() {
 	delete [] U_forward;
 	delete [] U_backward;
 	delete [] M2;
 	delete [] M2ReH;
 }
+
 
 int Propagator_on_Box_1D::eval_time_evol_unitary_for_real_timestep(double dt) {
 	
@@ -60,12 +60,15 @@ int Propagator_on_Box_1D::eval_time_evol_unitary_for_real_timestep(double dt) {
 	}
 
 	// Set both ends of each time evol unitary tridiagonals
-//	U_forward[3*Nx-1] = 0.0, U_backward[3*Nx-1] = 0.0;
-//	U_forward[0] = 0.0, U_backward[0] = 0.0;
+	U_forward[3*Nx-1] = 0.0, U_backward[3*Nx-1] = 0.0;
+	U_forward[0] = 0.0, U_backward[0] = 0.0;
+
 	return EXIT_SUCCESS;
 }
 
+
 int Propagator_on_Box_1D::eval_time_evol_unitary_for_imag_timestep(double dt_imag) {
+
 	// Construct unitary propagators
 	const double _c = -0.5*dt_imag/hbar;
 	std::complex<double> *pUf, *pUb;
@@ -80,33 +83,20 @@ int Propagator_on_Box_1D::eval_time_evol_unitary_for_imag_timestep(double dt_ima
 		*pUf = {_M2 + _c_M2ReH, 0.};  
 		*pUb = {_M2 - _c_M2ReH, 0.};
 	}
+	
+	// Set both ends of each time evol unitary tridiagonals
+	U_forward[3*Nx-1] = 0.0, U_backward[3*Nx-1] = 0.0;
+	U_forward[0] = 0.0, U_backward[0] = 0.0;
+
 	return EXIT_SUCCESS;
 }
+
 
 int Propagator_on_Box_1D::propagate(
 		std::complex<double> *wf, double dt, size_t Nt) 
 {
-
-	eval_time_evol_unitary_for_real_timestep(dt);
-
-	std::cout << "U_forward: \n";
-	print_tridiag(U_forward, Nx);
-	std::cout << "U_backward: \n";
-	print_tridiag(U_backward, Nx);
-	
 	// Construct unitary propagators
-//	const double _c = -0.5*dt/hbar;
-//	std::complex<double> *pUf, *pUf_max, *pUb;
-//	double *pM2, *pM2ReH;
-//	double _M2, _c_M2ReH;
-//	for (pUf=U_forward, pUf_max=U_forward+3*Nx, pUb=U_backward, 
-//			pM2=M2, pM2ReH=M2ReH;
-//			pUf < pUf_max;
-//			++pUf, ++pUb, ++pM2, ++pM2ReH) {
-//		_M2 = *pM2, _c_M2ReH = _c * (*pM2ReH);
-//		*pUf = {_M2, _c_M2ReH};
-//		*pUb = {_M2, -_c_M2ReH};
-//	}
+	eval_time_evol_unitary_for_real_timestep(dt);
 
 	// Propagate
 	std::complex<double> *wf_mid = new std::complex<double>[Nx];
@@ -118,5 +108,4 @@ int Propagator_on_Box_1D::propagate(
 
 	return EXIT_SUCCESS;
 }
-
 
