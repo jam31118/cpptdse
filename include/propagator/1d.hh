@@ -19,7 +19,20 @@ public:
 	Propagator_on_Box_1D(
 			size_t Nx, double dx, double *Vx, double hbar=1, double mass=1);
 	~Propagator_on_Box_1D();
+	int eval_time_evol_unitary_for_real_timestep(double dt);
+	int eval_time_evol_unitary_for_imag_timestep(double dt_imag);
 	int propagate(std::complex<double> *wf, double dt, size_t Nt);
+};
+
+
+// [NOTE] In order to use some of the members of parent class,
+// those members should be declared as `private` in the parent class.
+class Propagator_on_Box_1D_with_imag_pot {
+	Propagator_on_Box_1D_with_imag_pot(
+			size_t Nx, double dx, double *Vx, double *ImVx, double hbar=1, double mass=1);
+	~Propagator_on_Box_1D_with_imag_pot();
+	int eval_time_evol_unitary_for_real_timestep(double dt);
+	int eval_time_evol_unitary_for_imag_timestep(double dt_imag);
 };
 
 #endif // _PROPAGATOR_HH_
