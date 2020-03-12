@@ -18,4 +18,6 @@ int tridiag_backward(
 		std::complex<double> *v,
 		std::complex<double> *b, size_t N);
 
+void print_tridiag(std::complex<double> *td, size_t N);
+
 #endif // _TRIDIAG_HH_

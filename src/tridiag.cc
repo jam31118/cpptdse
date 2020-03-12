@@ -44,7 +44,7 @@ int tridiag_forward(
 		std::complex<double> *b, size_t N) 
 {
 	return tridiag_mul_forward< std::complex<double> >(
-			td+N, td+2*N, td+3*N, v, b, N);
+			td, td+N, td+2*N, v, b, N);
 }
 
 int tridiag_backward(
@@ -53,8 +53,15 @@ int tridiag_backward(
 		std::complex<double> *b, size_t N)
 {
 	return tridiag_mul_backward< std::complex<double> >(
-		 td+N, td+2*N, td+3*N, v, b, N);	
+		 td, td+N, td+2*N, v, b, N);	
 }
 
-
+void print_tridiag(std::complex<double> *td, size_t N) {
+	std::complex<double> *ptd=td, *ptd_max=td;
+	for (int i=0; i<3; ++i) {
+		for (ptd_max+=N; ptd<ptd_max; ++ptd) {
+			std::cout << *ptd;
+		} std::cout << std::endl;
+	}
+}
 
