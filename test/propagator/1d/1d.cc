@@ -11,6 +11,66 @@
 #include "../../../include/propagator/1d.hh"
 #include "../../../include/array.hh"
 
+class Wavefunction_on_Box_1D {
+	size_t Nx;
+	double dx;
+public:
+	Wavefunction_on_Box_1D(size_t Nx, double dx);
+	static double norm_sq(std::complex<double> *wf, size_t Nx, double dx);
+	double norm_sq(std::complex<double> *wf);
+	static int normalize(std::complex<double> *wf, size_t Nx, double dx);
+	int normalize(std::complex<double> *wf);
+};
+
+Wavefunction_on_Box_1D::Wavefunction_on_Box_1D(size_t Nx, double dx): 
+	Nx(Nx), dx(dx) {
+	if (!(Nx > 0)) { throw "`Nx` should be positive"; }
+	if (!(dx > 0)) { throw "`dx` should be real"; }
+};
+
+double Wavefunction_on_Box_1D::norm_sq(std::complex<double> *wf) {
+	return this->norm_sq(wf, this->Nx, this->dx);
+//	double _norm_sq = 0.0;
+//	std::complex<double> _wf;
+//	for (std::complex<double> *pwf=wf, *pwfmax=wf+Nx; pwf<pwfmax; ++pwf)
+//	{ 
+//		_wf = *pwf;
+//		_norm_sq += std::real( std::conj(_wf) * _wf ); 
+//	} _norm_sq *= dx;
+//	return _norm_sq;
+}
+
+double Wavefunction_on_Box_1D::norm_sq(
+		std::complex<double> *wf, size_t Nx, double dx) {
+	double _norm_sq = 0.0;
+	std::complex<double> _wf;
+	for (std::complex<double> *pwf=wf, *pwfmax=wf+Nx; pwf<pwfmax; ++pwf)
+	{ 
+		_wf = *pwf;
+		_norm_sq += std::real( std::conj(_wf) * _wf ); 
+	} _norm_sq *= dx;
+	return _norm_sq;
+}
+
+template <typename T1, typename T2>
+int array_mul_scalar(T1 *a, size_t N, T2 c) {
+	for (T1 *pa=a, *pamax=a+N; pa<pamax; ++pa) { *pa *= c; }
+	return EXIT_SUCCESS;
+}
+
+
+int Wavefunction_on_Box_1D::normalize(
+		std::complex<double> *wf, size_t Nx, double dx) {
+	double _norm_sq = Wavefunction_on_Box_1D::norm_sq(wf, Nx, dx);
+	return array_mul_scalar(wf, Nx, 1./std::sqrt(_norm_sq));	
+}
+
+int Wavefunction_on_Box_1D::normalize(std::complex<double> *wf) {
+	return this->normalize(wf, this->Nx, this->dx);
+}
+
+
+
 int main() {
 	
 	ParamFile param;
@@ -51,6 +111,10 @@ int main() {
 		wf[i] = std::sin(M_PI / L * (i+1)*dx);
 	}	
 
+
+	Wavefunction_on_Box_1D::normalize(wf, Nx, dx);
+
+
 	// Prepare storage for time-dependent wavefunction
 	std::complex<double> *wf_t_1d = new std::complex<double>[Nx*Nt];
 	std::complex<double> **wf_t = new std::complex<double>*[Nt];
@@ -66,21 +130,24 @@ int main() {
 	for (size_t it=0; it<Nt-1; ++it) {
 		prop.propagate(wf, dt, 1);
 
-		std::cout << "wf[" << it+1 << "]= \n";
-		print_array(wf, Nx);
+//		std::cout << "wf[" << it+1 << "]= \n";
+//		print_array(wf, Nx);
 
 		std::copy(wf, wf_max, wf_t[it+1]);
 	}
 	
 
 	// Write to output file
-	std::ofstream wf_t_file("wf_t.bin", std::ios::binary);
+	std::string wf_t_file_name("wf_t.bin");
+	std::ofstream wf_t_file(wf_t_file_name, std::ios::binary);
 	if (!wf_t_file.is_open()) {
 		std::cerr << "[ERROR] Failed to open file for `wf_t`\n";
 		return EXIT_FAILURE;
 	}
 	wf_t_file.write( (char *) wf_t_1d, Nt*Nx*sizeof(std::complex<double>));
 	wf_t_file.close();	
+	std::cout << "[ LOG ] Wavefunction file written to: " 
+		<< wf_t_file_name << std::endl; 
 
 
 	// Release resources
