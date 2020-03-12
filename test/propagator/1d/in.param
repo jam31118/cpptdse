@@ -1,4 +1,5 @@
 Nx int 21
 dx double 0.2
 dt double 0.05
+Nt int 11
 
