@@ -10,65 +10,7 @@
 
 #include "../../../include/propagator/1d.hh"
 #include "../../../include/array.hh"
-
-class Wavefunction_on_Box_1D {
-	size_t Nx;
-	double dx;
-public:
-	Wavefunction_on_Box_1D(size_t Nx, double dx);
-	static double norm_sq(std::complex<double> *wf, size_t Nx, double dx);
-	double norm_sq(std::complex<double> *wf);
-	static int normalize(std::complex<double> *wf, size_t Nx, double dx);
-	int normalize(std::complex<double> *wf);
-};
-
-Wavefunction_on_Box_1D::Wavefunction_on_Box_1D(size_t Nx, double dx): 
-	Nx(Nx), dx(dx) {
-	if (!(Nx > 0)) { throw "`Nx` should be positive"; }
-	if (!(dx > 0)) { throw "`dx` should be real"; }
-};
-
-double Wavefunction_on_Box_1D::norm_sq(std::complex<double> *wf) {
-	return this->norm_sq(wf, this->Nx, this->dx);
-//	double _norm_sq = 0.0;
-//	std::complex<double> _wf;
-//	for (std::complex<double> *pwf=wf, *pwfmax=wf+Nx; pwf<pwfmax; ++pwf)
-//	{ 
-//		_wf = *pwf;
-//		_norm_sq += std::real( std::conj(_wf) * _wf ); 
-//	} _norm_sq *= dx;
-//	return _norm_sq;
-}
-
-double Wavefunction_on_Box_1D::norm_sq(
-		std::complex<double> *wf, size_t Nx, double dx) {
-	double _norm_sq = 0.0;
-	std::complex<double> _wf;
-	for (std::complex<double> *pwf=wf, *pwfmax=wf+Nx; pwf<pwfmax; ++pwf)
-	{ 
-		_wf = *pwf;
-		_norm_sq += std::real( std::conj(_wf) * _wf ); 
-	} _norm_sq *= dx;
-	return _norm_sq;
-}
-
-template <typename T1, typename T2>
-int array_mul_scalar(T1 *a, size_t N, T2 c) {
-	for (T1 *pa=a, *pamax=a+N; pa<pamax; ++pa) { *pa *= c; }
-	return EXIT_SUCCESS;
-}
-
-
-int Wavefunction_on_Box_1D::normalize(
-		std::complex<double> *wf, size_t Nx, double dx) {
-	double _norm_sq = Wavefunction_on_Box_1D::norm_sq(wf, Nx, dx);
-	return array_mul_scalar(wf, Nx, 1./std::sqrt(_norm_sq));	
-}
-
-int Wavefunction_on_Box_1D::normalize(std::complex<double> *wf) {
-	return this->normalize(wf, this->Nx, this->dx);
-}
-
+#include "../../../include/wf/wavefunction-on-box-1d.h"
 
 
 int main() {
@@ -112,7 +54,19 @@ int main() {
 	}	
 
 
-	Wavefunction_on_Box_1D::normalize(wf, Nx, dx);
+//	std::cerr << "in:main():before normalize\n";
+	prop.wf->normalize(wf);	
+//	try {	
+//		prop.wf->normalize(wf);	
+//	} catch (std::exception& e) {
+//		std::cerr << "error: " << e.what() << std::endl;
+//		return EXIT_FAILURE;
+//	} catch (...) {
+//		std::cerr << "[ERROR] Unknown exception\n";
+//		return EXIT_FAILURE;
+//	}
+//	Wavefunction_on_Box_1D::normalize(wf, Nx, dx);
+//	std::cerr << "in:main():after normalize\n";
 
 
 	// Prepare storage for time-dependent wavefunction

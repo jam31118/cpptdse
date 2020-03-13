@@ -13,4 +13,10 @@ void print_array(T *a, size_t N) {
 	} std::cout << std::endl;
 }
 
+template <typename T1, typename T2>
+int array_mul_scalar(T1 *a, size_t N, T2 c) {
+	for (T1 *pa=a, *pamax=a+N; pa<pamax; ++pa) { *pa *= c; }
+	return EXIT_SUCCESS;
+}
+
 #endif // _ARRAY_HH_
