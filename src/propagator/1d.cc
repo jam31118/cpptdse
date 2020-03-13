@@ -1,9 +1,8 @@
 #include <iostream>
 
 #include "../../include/propagator/1d.hh"
-#include "../../include/tridiag.hh"
-#include "../../include/array.hh"
-#include "../../include/tridiag.hh"
+#include "../../include/tridiag.h"
+#include "../../include/array.h"
 #include "../../include/wf/wavefunction-on-box-1d.h"
 
 
@@ -13,10 +12,7 @@ Propagator_on_Box_1D::Propagator_on_Box_1D(
 
 	if (dx <= 0.) { throw "[ERROR] Negative `dx` found"; }
 
-//	std::cerr << "in:Propagator_on_Box_1D: before wf init\n";
 	wf = new Wavefunction_on_Box_1D(Nx, dx);
-//	wf = &_wf;
-//	std::cerr << "in:Propagator_on_Box_1D: after wf init\n";
 
 	const size_t N_tridiag = 3*Nx;
 

@@ -1,4 +1,4 @@
-#include "../include/tridiag.hh"
+#include "../include/tridiag.h"
 #include <complex>
 #include "matrix.hh"
 

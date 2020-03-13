@@ -1,5 +1,5 @@
-#ifndef _TRIDIAG_HH_
-#define _TRIDIAG_HH_
+#ifndef _TRIDIAG_H_
+#define _TRIDIAG_H_
 
 #include <cstdlib>
 #include <complex>
@@ -20,4 +20,4 @@ int tridiag_backward(
 
 void print_tridiag(std::complex<double> *td, size_t N);
 
-#endif // _TRIDIAG_HH_
+#endif // _TRIDIAG_H_

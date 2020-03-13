@@ -9,7 +9,7 @@
 #include "param.h"
 
 #include "../../../include/propagator/1d.hh"
-#include "../../../include/array.hh"
+#include "../../../include/array.h"
 #include "../../../include/wf/wavefunction-on-box-1d.h"
 
 

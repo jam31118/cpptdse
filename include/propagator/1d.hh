@@ -1,5 +1,5 @@
-#ifndef _PROPAGATOR_HH_
-#define _PROPAGATOR_HH_
+#ifndef _PROPAGATOR_H_
+#define _PROPAGATOR_H_
 
 #include <cstdlib>
 #include <complex>
@@ -38,4 +38,4 @@ class Propagator_on_Box_1D_with_imag_pot {
 	int eval_time_evol_unitary_for_imag_timestep(double dt_imag);
 };
 
-#endif // _PROPAGATOR_HH_
+#endif // _PROPAGATOR_H_

@@ -1,5 +1,5 @@
-#ifndef _ARRAY_HH_
-#define _ARRAY_HH_
+#ifndef _ARRAY_H_
+#define _ARRAY_H_
 
 #include <cstdlib>
 #include <iostream>
@@ -19,4 +19,4 @@ int array_mul_scalar(T1 *a, size_t N, T2 c) {
 	return EXIT_SUCCESS;
 }
 
-#endif // _ARRAY_HH_
+#endif // _ARRAY_H_
