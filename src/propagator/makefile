@@ -2,10 +2,10 @@ include ../var.mk
 
 all: libpropagator.a
 
-libpropagator.a: 1d.o
+libpropagator.a: propagator-on-box-1d.o
 	$(AR) rcs -o $@ $^
 
-1d.o: 1d.cc
+propagator-on-box-1d.o: propagator-on-box-1d.cc
 	$(CXX) -fPIC -c -o $@ $< $(OPT_FLAGS) $(MATRIX_INC_FLAGS)
 
 clean:

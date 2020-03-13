@@ -1,15 +1,17 @@
 include var.mk
 
 LIB_DIR=../lib
+WF_LIB_DIR = ./wf
+PROPAGATOR_LIB_DIR = ./propagator
 
 all: install
 
 install: libtdse.so
 	if [ ! -d "$$LIB_DIR" ]; then mkdir -p $(LIB_DIR); mv $^ $(LIB_DIR); fi
 
-libtdse.so: tridiag.o array.o ./propagator/libpropagator.a libwf.a
+libtdse.so: tridiag.o array.o libpropagator.a libwf.a
 	$(CXX) -shared *.o -o $@ \
-		-Wl,--whole-archive ./propagator/libpropagator.a ./wf/libwf.a \
+		-Wl,--whole-archive $(PROPAGATOR_LIB_DIR)/libpropagator.a $(WF_LIB_DIR)/libwf.a \
 		-Wl,--no-whole-archive $(MATRIX_LIB_FLAGS)
 
 tridiag.o: tridiag.cc
@@ -18,15 +20,15 @@ tridiag.o: tridiag.cc
 array.o: array.cc
 	$(CXX) -c -o $@ $< -fPIC $(OPT_FLAGS)
 
-./propagator/libpropagator.a:
-	$(MAKE) -C ./propagator
+libpropagator.a:
+	$(MAKE) -C $(PROPAGATOR_LIB_DIR)
 
 libwf.a:
-	$(MAKE) -C ./wf
+	$(MAKE) -C $(WF_LIB_DIR)
 
 clean:
 	$(RM) *.o *.so $(LIB_DIR)/*.so
 	if [ -d "$$LIB_DIR" ]; then rmdir $(LIB_DIR); fi
-	$(MAKE) clean -C ./propagator
-	$(MAKE) clean -C ./wf
+	$(MAKE) clean -C $(PROPAGATOR_LIB_DIR)
+	$(MAKE) clean -C $(WF_LIB_DIR)
 
