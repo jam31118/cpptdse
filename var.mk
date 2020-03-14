@@ -1,0 +1,3 @@
+OPT_FLAGS = -O3
+WARN_FLAGS = -Wall
+
