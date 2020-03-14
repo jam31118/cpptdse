@@ -6,6 +6,7 @@
 
 #include "../wf/wavefunction-on-box-1d.h"
 
+
 class Propagator_on_Box_1D {
 
 	size_t Nx;
@@ -15,8 +16,6 @@ class Propagator_on_Box_1D {
 	double *M2ReH;
 
 public:
-
-	Wavefunction_on_Box_1D *wf = NULL;
 
 	Propagator_on_Box_1D(
 			size_t Nx, double dx, double *Vx, double hbar=1, double mass=1);
@@ -38,5 +37,6 @@ class Propagator_on_Box_1D_with_imag_pot {
 	int eval_time_evol_unitary_for_real_timestep(double dt);
 	int eval_time_evol_unitary_for_imag_timestep(double dt_imag);
 };
+
 
 #endif // _PROPAGATOR_ON_BOX_1D_H_

@@ -12,8 +12,6 @@ Propagator_on_Box_1D::Propagator_on_Box_1D(
 
 	if (dx <= 0.) { throw "[ERROR] Negative `dx` found"; }
 
-	wf = new Wavefunction_on_Box_1D(Nx, dx);
-
 	const size_t N_tridiag = 3*Nx;
 
 	U_forward = new std::complex<double>[N_tridiag];
@@ -43,7 +41,6 @@ Propagator_on_Box_1D::~Propagator_on_Box_1D() {
 	delete [] U_backward;
 	delete [] M2;
 	delete [] M2ReH;
-	delete wf;
 }
 
 
@@ -119,7 +116,7 @@ int Propagator_on_Box_1D::propagate_to_ground_state(
 	
 	std::complex<double> *wf_max = wf + Nx;
 	std::complex<double> *wf_prev = new std::complex<double>[Nx];
-	this->wf->normalize(wf);
+	Wavefunction_on_Box_1D::normalize(wf, Nx, dx);	
 	std::copy(wf, wf_max, wf_prev);
 
 	double norm_diff;
@@ -135,12 +132,10 @@ int Propagator_on_Box_1D::propagate_to_ground_state(
 		tridiag_forward(U_forward, wf, wf_mid, Nx);
 		tridiag_backward(U_backward, wf, wf_mid, Nx);
 
-
-		this->wf->normalize(wf);
+		Wavefunction_on_Box_1D::normalize(wf, Nx, dx);	
 
 		substract(wf, wf_prev, wf_diff, Nx);
-		norm_diff = this->wf->norm_sq(wf_diff);
-
+		norm_diff = Wavefunction_on_Box_1D::norm_sq(wf_diff, Nx, dx);
 		if (norm_diff < stop_thres) { break; }
 
 		std::copy(wf, wf_max, wf_prev);
