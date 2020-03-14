@@ -1,6 +1,8 @@
 #include "../../include/wf/wavefunction-on-box-1d.h"
 #include "../../include/array.h"
 
+#include <cmath>
+
 
 Wavefunction_on_Box_1D::Wavefunction_on_Box_1D(size_t Nx, double dx): 
 	Nx(Nx), dx(dx) {
@@ -33,8 +35,18 @@ int Wavefunction_on_Box_1D::normalize(
 	return array_mul_scalar(wf, Nx, 1./std::sqrt(_norm_sq));	
 }
 
-
 int Wavefunction_on_Box_1D::normalize(std::complex<double> *wf) {
 	return this->normalize(wf, this->Nx, this->dx);
+}
+
+
+
+int eval_ground_state_in_box_1d(
+		std::complex<double> *wf, size_t Nx, double dx) {
+	const size_t Nx_tot = 1+Nx+1;
+	const double L = dx * (Nx_tot-1);
+	const double c = std::sqrt(2./L);  // a normalizing constant
+	for (size_t i=0; i<Nx; ++i) { wf[i] = c * std::sin(M_PI / L * (i+1)*dx); }
+	return EXIT_SUCCESS;	
 }
 

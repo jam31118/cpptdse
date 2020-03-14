@@ -3,6 +3,7 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <random>
 
 int add(double *a, double *b, double *c, size_t N);
 
@@ -24,6 +25,27 @@ int substract(T1 *a1, T2 *a2, T *a, size_t N) {
 	T1 *pa1=a1; T2 *pa2=a2; T *pa=a, *pamax=a+N;
 	for (; pa<pamax; ++pa, ++pa1, ++pa2) 
 	{ *pa = (*pa1) - (*pa2); }
+	return EXIT_SUCCESS;
+}
+
+
+template <typename T>
+int set_to_zeros(T *a, size_t N) {
+	for (T *pa=a, *pa_max=a+N; pa<pa_max; ++pa) { *pa = 0.; }
+	return EXIT_SUCCESS;
+}
+
+
+// [NOTE] For an array of complex numbers, 
+// .. imaginary part is set to zero by default
+template <typename T>
+int set_to_randoms(
+		T *const a, const size_t N, const double l=-1., const double u=1.) {
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_real_distribution<double> unidis(l, u);
+	for (T *pa=a, *pamax=a+N; pa<pamax; ++pa)
+	{ *pa = unidis(gen); } 
 	return EXIT_SUCCESS;
 }
 
