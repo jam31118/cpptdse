@@ -1,16 +1,14 @@
 #include <complex>
 #include <cstdlib>
 #include <iostream>
-#include <random>
 #include <fstream>
 #include <algorithm>
-//#include <cmath>
 
 #include "param.h"
 
 #include "../../../include/propagator/propagator-on-box-1d.h"
-#include "../../../include/array.h"
 #include "../../../include/wf/wavefunction-on-box-1d.h"
+#include "../../../include/array.h"
 
 
 int main() {
@@ -33,44 +31,20 @@ int main() {
 	const size_t Nt = param.get_int("Nt");
 
 	double *Vx = new double[Nx];
-	for (double *pVx=Vx, *pVx_max=Vx+Nx; pVx<pVx_max; ++pVx) { *pVx = 0.; }
+	set_to_zeros(Vx, Nx);
 
 	Propagator_on_Box_1D prop = Propagator_on_Box_1D(Nx, dx, Vx);
 
+	
+	//// Prepare initial state
+	//
 	std::complex<double> *wf = new std::complex<double>[Nx];
-
-	// Assign to random numbers
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_real_distribution<double> unidis(-1., 1.);
-	for (std::complex<double> *pwf=wf, *pwfmax=wf+Nx; pwf<pwfmax; ++pwf)
-	{ *pwf = unidis(gen); } // imaginary part is set to zero by default
-
-
-//	const size_t Nx_tot = 1+Nx+1;
-//	const double L = dx * (Nx_tot-1);
-//	for (size_t i=0; i<Nx; ++i) {
-//		wf[i] = std::sin(M_PI / L * (i+1)*dx);
-//	}	
-
+	set_to_randoms(wf, Nx); // Initialize wavefunction array to random numbers
+	// Propagate to lowest energy possible from given wf
 	if (prop.propagate_to_ground_state(wf, dt, 5000, 1e-8) != EXIT_SUCCESS) {
 		std::cerr << "[ERROR] Failed to propagate to ground state\n";
 		return EXIT_FAILURE;		
 	} std::cout << "[ LOG ] COMPLETE: A propagation to ground state\n";
-
-//	std::cerr << "in:main():before normalize\n";
-//	prop.wf->normalize(wf);	
-//	try {	
-//		prop.wf->normalize(wf);	
-//	} catch (std::exception& e) {
-//		std::cerr << "error: " << e.what() << std::endl;
-//		return EXIT_FAILURE;
-//	} catch (...) {
-//		std::cerr << "[ERROR] Unknown exception\n";
-//		return EXIT_FAILURE;
-//	}
-//	Wavefunction_on_Box_1D::normalize(wf, Nx, dx);
-//	std::cerr << "in:main():after normalize\n";
 
 
 	// Prepare storage for time-dependent wavefunction
