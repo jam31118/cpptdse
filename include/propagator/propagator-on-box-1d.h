@@ -16,7 +16,7 @@ class Propagator_on_Box_1D {
 	double *M2ReH;
 
 public:
-
+	Propagator_on_Box_1D();
 	Propagator_on_Box_1D(
 			size_t Nx, double dx, double *Vx, double hbar=1, double mass=1);
 	~Propagator_on_Box_1D();

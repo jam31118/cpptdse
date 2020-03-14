@@ -6,6 +6,9 @@
 #include "../../include/wf/wavefunction-on-box-1d.h"
 
 
+Propagator_on_Box_1D::Propagator_on_Box_1D() {}
+
+
 Propagator_on_Box_1D::Propagator_on_Box_1D(
 		size_t Nx, double dx, double *Vx, double hbar, double mass): 
 	Nx(Nx), dx(dx), Vx(Vx), hbar(hbar), mass(mass) {
