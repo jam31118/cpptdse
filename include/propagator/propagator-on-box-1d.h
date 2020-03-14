@@ -24,7 +24,8 @@ public:
 	int eval_time_evol_unitary_for_real_timestep(double dt);
 	int eval_time_evol_unitary_for_imag_timestep(double dt_imag);
 	int propagate(std::complex<double> *wf, double dt, size_t Nt);
-
+	int propagate_to_ground_state(
+			std::complex<double> *wf, double dt, size_t Nt_max, double stop_thres);
 };
 
 

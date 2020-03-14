@@ -71,7 +71,8 @@ int Propagator_on_Box_1D::eval_time_evol_unitary_for_real_timestep(double dt) {
 }
 
 
-int Propagator_on_Box_1D::eval_time_evol_unitary_for_imag_timestep(double dt_imag) {
+int Propagator_on_Box_1D::eval_time_evol_unitary_for_imag_timestep(
+		double dt_imag) {
 
 	// Construct unitary propagators
 	const double _c = -0.5*dt_imag/hbar;
@@ -111,5 +112,51 @@ int Propagator_on_Box_1D::propagate(
 	delete [] wf_mid;
 
 	return EXIT_SUCCESS;
+}
+
+int Propagator_on_Box_1D::propagate_to_ground_state(
+		std::complex<double> *wf, double dt, size_t Nt_max, double stop_thres) {
+	
+	std::complex<double> *wf_max = wf + Nx;
+	std::complex<double> *wf_prev = new std::complex<double>[Nx];
+	this->wf->normalize(wf);
+	std::copy(wf, wf_max, wf_prev);
+
+	double norm_diff;
+
+	std::complex<double> *wf_diff = new std::complex<double>[Nx];
+	
+	// Propagate
+	eval_time_evol_unitary_for_imag_timestep(dt);
+	std::complex<double> *wf_mid = new std::complex<double>[Nx];
+	size_t it;
+	for (it=0; it<Nt_max; ++it) {
+
+		tridiag_forward(U_forward, wf, wf_mid, Nx);
+		tridiag_backward(U_backward, wf, wf_mid, Nx);
+
+
+		this->wf->normalize(wf);
+
+		substract(wf, wf_prev, wf_diff, Nx);
+		norm_diff = this->wf->norm_sq(wf_diff);
+
+		if (norm_diff < stop_thres) { break; }
+
+		std::copy(wf, wf_max, wf_prev);
+	}
+	int return_code = EXIT_SUCCESS;
+	if (it >= Nt_max) { 
+		std::cerr << "[ERROR] Maximum iteration (=" << Nt_max << ") exceeded\n"; 
+		// should not return from here 
+		// since we need to proceed to complete resource release process
+		return_code = EXIT_FAILURE;  
+	}
+
+	delete [] wf_mid;
+	delete [] wf_prev;
+	delete [] wf_diff;
+
+	return return_code;
 }
 
