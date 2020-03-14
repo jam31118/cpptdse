@@ -49,4 +49,16 @@ int set_to_randoms(
 	return EXIT_SUCCESS;
 }
 
+
+template <typename T>
+int set_2d_view_of_1d(T **arr2d, T *arr1d, size_t N0, size_t N1) {
+	for (
+			T **parr2d = arr2d, **parr2d_max = arr2d + N0, *parr1d = arr1d; 
+			parr2d < parr2d_max; 
+			++parr2d, parr1d += N1) 
+	{ *parr2d = parr1d; }
+	return EXIT_SUCCESS;
+}
+
+
 #endif // _ARRAY_H_
