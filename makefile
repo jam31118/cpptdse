@@ -1,4 +1,5 @@
 SRC_DIR = ./src
+TEST_DIR = ./test
 
 all: install
 
@@ -7,4 +8,5 @@ install:
 
 clean:
 	$(MAKE) clean -C $(SRC_DIR)
+	$(MAKE) clean -C $(TEST_DIR)
 
