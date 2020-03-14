@@ -6,3 +6,4 @@ int add(double *a, double *b, double *c, size_t N) {
 	}
 	return EXIT_SUCCESS;
 }
+
