@@ -7,7 +7,7 @@ PROPAGATOR_LIB_DIR = ./propagator
 all: install
 
 install: libtdse.so
-	if [ ! -d "$$LIB_DIR" ]; then mkdir -p $(LIB_DIR); mv $^ $(LIB_DIR); fi
+	if [ ! -d "$(LIB_DIR)" ]; then mkdir -p $(LIB_DIR); mv $^ $(LIB_DIR); fi
 
 libtdse.so: tridiag.o array.o libpropagator.a libwf.a
 	$(CXX) -shared *.o -o $@ \
