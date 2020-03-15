@@ -50,3 +50,16 @@ int eval_ground_state_in_box_1d(
 	return EXIT_SUCCESS;	
 }
 
+
+// Construct spatial array
+//
+int Wavefunction_on_Box_1D::eval_x_tot_arr(double *const x_tot_arr, 
+		const size_t Nx_tot, const double dx, const double xmin) {
+	
+  for (double *px=x_tot_arr, *pxmax=x_tot_arr+Nx_tot, val=xmin; 
+			px < pxmax; ++px, val+=dx)
+  { *px = val; }
+
+	return EXIT_SUCCESS;
+}
+

@@ -114,6 +114,7 @@ int Propagator_on_Box_1D::propagate(
 	return EXIT_SUCCESS;
 }
 
+
 int Propagator_on_Box_1D::propagate_to_ground_state(
 		std::complex<double> *wf, double dt, size_t Nt_max, double stop_thres) {
 	
@@ -157,4 +158,6 @@ int Propagator_on_Box_1D::propagate_to_ground_state(
 
 	return return_code;
 }
+
+
 

@@ -17,6 +17,8 @@ public:
 	double norm_sq(std::complex<double> *wf);
 	static int normalize(std::complex<double> *wf, size_t Nx, double dx);
 	int normalize(std::complex<double> *wf);
+	static int eval_x_tot_arr(double *const x_tot_arr, 
+			const size_t Nx_tot, const double dx, const double xmin);
 };
 
 
