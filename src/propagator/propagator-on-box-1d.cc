@@ -15,7 +15,7 @@ Propagator_on_Box_1D::Propagator_on_Box_1D(
 
 	if (dx <= 0.) { throw "[ERROR] Negative `dx` found"; }
 
-	const size_t N_tridiag = 3*Nx;
+	N_tridiag = 3*Nx;
 
 	U_forward = new std::complex<double>[N_tridiag];
 	U_backward = new std::complex<double>[N_tridiag];

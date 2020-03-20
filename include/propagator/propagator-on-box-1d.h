@@ -9,11 +9,15 @@
 
 class Propagator_on_Box_1D {
 
-	size_t Nx;
-	double dx, *Vx, hbar, mass;
+protected:
+	size_t Nx, N_tridiag;
+	double dx;
+	const size_t Ndim = 1;
 	std::complex<double> *U_forward, *U_backward;
+	double *Vx;
 	double *M2;
 	double *M2ReH;
+	double hbar, mass;
 
 public:
 	Propagator_on_Box_1D();
