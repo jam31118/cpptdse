@@ -1,5 +1,5 @@
-Nx int 21
+Nx int 56
 dx double 0.2
 dt double 0.1
-Nt int 101
+Nt int 4001
 

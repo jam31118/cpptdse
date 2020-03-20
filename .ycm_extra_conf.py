@@ -22,6 +22,8 @@ def Settings( **kwargs ):
         '-x', 'c++', '-Wall', '-Wextra', '-Werror',
         '-I', TDSEINC, 
         '-I', MATRIX_INC,
-        '-I', PARAM_INC ],
+        '-I', PARAM_INC,
+        '-DFIELD',
+        ],
   }
 
