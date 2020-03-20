@@ -57,7 +57,7 @@ int main() {
 
 	// Construct a propagator object
 #ifdef FIELD
-	Propagator_on_Box_1D_under_field prop(Nx, dx, Vx);
+	Propagator_on_Box_1D_under_field prop(Nx, dx, Vx, &A_func);
 #else // FIELD
 	Propagator_on_Box_1D prop(Nx, dx, Vx);
 #endif // FIELD
@@ -92,7 +92,7 @@ int main() {
 	std::copy(wf, wf_max, wf_t[0]);
 	for (size_t it=0; it<Nt-1; ++it) {
 #ifdef FIELD
-		prop.propagate_under_field(wf, dt, A_func(t+0.5*dt)); // should be t+0.5*dt
+		prop.propagate_under_field(wf, dt, t);
 		t += dt;
 		At[it+1] = A_func(t);
 #else // FIELD
