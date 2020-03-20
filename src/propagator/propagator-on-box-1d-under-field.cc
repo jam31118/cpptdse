@@ -5,9 +5,9 @@
 
 
 Propagator_on_Box_1D_under_field::Propagator_on_Box_1D_under_field(
-		size_t Nx, double dx, double *Vx, 
+		size_t Nx, double dx, double *Vx, double (*pAfunc)(double),
 		double hbar, double mass, double charge) : 
-	Propagator_on_Box_1D(Nx, dx, Vx, hbar, mass), charge(charge)
+	Propagator_on_Box_1D(Nx, dx, Vx, hbar, mass), pAfunc(pAfunc), charge(charge)
 {
 
 	M1 = new double[N_tridiag];
@@ -32,7 +32,7 @@ Propagator_on_Box_1D_under_field::~Propagator_on_Box_1D_under_field() {
 
 
 int Propagator_on_Box_1D_under_field::propagate_under_field(
-		std::complex<double> *wf, double dt, double At) {
+		std::complex<double> *wf, double dt, double t) {
 
 	//// Prepare time evolution unitary tridiagonals
 	//
@@ -44,7 +44,8 @@ int Propagator_on_Box_1D_under_field::propagate_under_field(
 		*M2U0_quarter_dt_backward = U_backward; // aliasing
 	//
 	// For HA: the Hamiltonian under electromagnatic field in velocity gauge
-	const double coef = 0.5 * dt * charge / mass * At;
+	const double At_at_half = (*pAfunc)(t+0.5*dt);
+	const double coef = 0.5 * dt * charge / mass * At_at_half;
 	v1_add_c_mul_v2(M1UA_half_dt_forward, M1, coef, D1, N_tridiag);
 	v1_add_c_mul_v2(M1UA_half_dt_backward, M1, -coef, D1, N_tridiag);
 
