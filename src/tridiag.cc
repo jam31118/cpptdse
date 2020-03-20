@@ -1,6 +1,6 @@
 #include "../include/tridiag.h"
 #include <complex>
-#include "matrix.hh"
+
 
 int eval_M2_tridiag(double *T, size_t N) {
 
@@ -14,9 +14,25 @@ int eval_M2_tridiag(double *T, size_t N) {
 	return EXIT_SUCCESS;
 }
 
+
+int eval_M1_tridiag(double *T, size_t N) {
+
+	const double val_diag = 2./3., val_offdiag = 1./6.;
+
+	double *pT = T+1, *pT_max = T;
+	for (pT_max += N; pT < pT_max; ++pT) { *pT = val_offdiag; }
+	for (pT_max += N; pT < pT_max; ++pT) { *pT = val_diag; }
+	for (pT_max += N-1; pT < pT_max; ++pT) { *pT = val_offdiag; }
+
+	return EXIT_SUCCESS;
+}
+
+
 int eval_D2_tridiag(double *T, double h, size_t N, double coef) {
+
+	if (!(h > 0)) { return EXIT_FAILURE; }
 	
-	const double val_offdiag = coef * 1./ (h*h);
+	const double val_offdiag = coef / (h*h);
 	const double val_diag = -2. * val_offdiag;
 
 	double *pT = T+1, *pT_max = T;
@@ -26,6 +42,24 @@ int eval_D2_tridiag(double *T, double h, size_t N, double coef) {
 
 	return EXIT_SUCCESS;
 }
+
+
+int eval_D1_tridiag(double *T, double h, size_t N) {
+
+	if (!(h > 0)) { return EXIT_FAILURE; }
+	
+	const double val_lower_offdiag = - 1. / (2.*h);
+	const double val_upper_offdiag = 1. / (2.*h);
+	const double val_diag = 0.;
+
+	double *pT = T+1, *pT_max = T;
+	for (pT_max += N; pT < pT_max; ++pT) { *pT = val_lower_offdiag; }
+	for (pT_max += N; pT < pT_max; ++pT) { *pT = val_diag; }
+	for (pT_max += N-1; pT < pT_max; ++pT) { *pT = val_upper_offdiag; }
+
+	return EXIT_SUCCESS;
+}
+
 
 int tridiag_mul_diag(double *T, double *D, double *TD, size_t N) {
 
@@ -37,24 +71,6 @@ int tridiag_mul_diag(double *T, double *D, double *TD, size_t N) {
 	return EXIT_SUCCESS;
 }
 
-
-int tridiag_forward(
-		std::complex<double> *td, 
-		std::complex<double> *v, 
-		std::complex<double> *b, size_t N) 
-{
-	return tridiag_mul_forward< std::complex<double> >(
-			td, td+N, td+2*N, v, b, N);
-}
-
-int tridiag_backward(
-		std::complex<double> *td,
-		std::complex<double> *v,
-		std::complex<double> *b, size_t N)
-{
-	return tridiag_mul_backward< std::complex<double> >(
-		 td, td+N, td+2*N, v, b, N);	
-}
 
 void print_tridiag(std::complex<double> *td, size_t N) {
 	std::complex<double> *ptd=td, *ptd_max=td;
