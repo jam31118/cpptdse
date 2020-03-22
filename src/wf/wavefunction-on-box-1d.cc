@@ -67,7 +67,7 @@ size_t Wavefunction_on_Box_1D::get_Nx_tot()
 { return 1 + Nx + 1; }
 
 double Wavefunction_on_Box_1D::get_xmax(double xmin)
-{ return xmin * (Nx+1)*dx; }
+{ return xmin + (Nx+1)*dx; }
 
 double Wavefunction_on_Box_1D::get_dx() { return dx; }
 
