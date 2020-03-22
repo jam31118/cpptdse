@@ -1,5 +1,7 @@
-Nx int 56
-dx double 0.2
-dt double 0.1
-Nt int 4001
+Nx int 212
+dx double 0.1
+dt double 0.05
+Nt int 201
+
+wf-t0-file string wf-t0.bin
 

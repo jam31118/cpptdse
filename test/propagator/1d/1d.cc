@@ -66,12 +66,30 @@ int main() {
 	// Prepare initial state
 	//
 	std::complex<double> *wf = new std::complex<double>[Nx];
-	set_to_randoms(wf, Nx); // Initialize wavefunction array to random numbers
-	// Propagate to lowest energy possible from given wf
-	if (prop.propagate_to_ground_state(wf, dt, 5000, 1e-13) != EXIT_SUCCESS) {
-		std::cerr << "[ERROR] Failed to propagate to ground state\n";
-		return EXIT_FAILURE;		
-	} std::cout << "[ LOG ] COMPLETE: A propagation to ground state\n";
+	std::string wf_t0_fname;
+	try { wf_t0_fname = param.get_string("wf-t0-file"); }
+	catch (...) { 
+		std::cout << "[ LOG ] No file for initial wavefunction found. "
+			"Falling back to search for ground state\n";
+	}
+	if (!wf_t0_fname.empty()) {
+		try { 
+			std::ifstream wf_t0_file(wf_t0_fname, std::ios::binary);
+			wf_t0_file.read((char *) wf, Nx * sizeof(std::complex<double>));
+			wf_t0_file.close();
+		} catch (...) {
+			std::cerr << "[ERROR] Failed to read initial wavefunction from: " 
+				<< wf_t0_fname << std::endl;
+			return EXIT_FAILURE;
+		}
+	} else {
+		set_to_randoms(wf, Nx); // Initialize wavefunction array to random numbers
+		// Propagate to lowest energy possible from given wf
+		if (prop.propagate_to_ground_state(wf, dt, 5000, 1e-13) != EXIT_SUCCESS) {
+			std::cerr << "[ERROR] Failed to propagate to ground state\n";
+			return EXIT_FAILURE;		
+		} std::cout << "[ LOG ] COMPLETE: A propagation to ground state\n";
+	}
 
 
 	// Prepare storage for time-dependent wavefunction
