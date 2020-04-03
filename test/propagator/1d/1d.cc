@@ -66,6 +66,8 @@ int main() {
 	// Prepare initial state
 	//
 	std::complex<double> *wf = new std::complex<double>[Nx];
+
+	// Try to get the name of file for initial wavefunction data, if any.
 	std::string wf_t0_fname;
 	try { wf_t0_fname = param.get_string("wf-t0-file"); }
 	catch (...) { 
@@ -85,7 +87,7 @@ int main() {
 	} else {
 		set_to_randoms(wf, Nx); // Initialize wavefunction array to random numbers
 		// Propagate to lowest energy possible from given wf
-		if (prop.propagate_to_ground_state(wf, dt, 5000, 1e-13) != EXIT_SUCCESS) {
+		if (prop.propagate_to_ground_state(wf, dt, 20000, 1e-13) != EXIT_SUCCESS) {
 			std::cerr << "[ERROR] Failed to propagate to ground state\n";
 			return EXIT_FAILURE;		
 		} std::cout << "[ LOG ] COMPLETE: A propagation to ground state\n";
