@@ -10,6 +10,8 @@
 
 class Wavefunction_on_Box_1D {
 
+protected:
+
 	size_t Nx;
 	double dx;
 
@@ -25,7 +27,20 @@ public:
 	size_t get_Nx_tot();
 	double get_xmax(double xmin);
 	double get_dx();
+	static double mean_x(
+			std::complex<double> *wf, size_t Nx, double dx, double xmin);
+	double mean_x(std::complex<double> *wf, double xmin);
+	static int stdev_x(
+			std::complex<double> *wf, size_t Nx, double dx, double xmin, 
+			double *p_stdev_x);
+	double stdev_x(std::complex<double> *wf, double xmin);
+	static int mean_and_stdev_x(
+			std::complex<double> *wf, size_t Nx, double dx, double xmin, 
+			double *p_mean_x, double *p_stdev_x);
+	int mean_and_stdev_x(std::complex<double> *wf, double xmin, 
+			double *p_mean_x, double *p_stdev_x);
 };
+
 
 
 

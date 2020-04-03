@@ -39,6 +39,74 @@ int Wavefunction_on_Box_1D::normalize(std::complex<double> *wf) {
 	return this->normalize(wf, this->Nx, this->dx);
 }
 
+/**
+ * The number of grid points `Nx` is the total number except two at both ends.
+ */
+double Wavefunction_on_Box_1D::mean_x(
+		std::complex<double> *wf, size_t Nx, double dx, double xmin) {
+	
+	double _mean_x = 0., _x = xmin;
+	std::complex<double> _wf;
+	for (std::complex<double> *pwf=wf, *pwfmax=wf+Nx; pwf<pwfmax; ++pwf)
+	{ 
+		_wf = *pwf; 
+		_x += dx;
+		_mean_x += _x * (std::conj(_wf) * _wf).real();
+	} _mean_x *= dx;
+	return _mean_x;
+}
+
+
+double Wavefunction_on_Box_1D::mean_x(std::complex<double> *wf, double xmin) {
+	return Wavefunction_on_Box_1D::mean_x(wf, Nx, dx, xmin);
+}
+
+
+int Wavefunction_on_Box_1D::mean_and_stdev_x(
+		std::complex<double> *wf, size_t Nx, double dx, double xmin, 
+		double *p_mean_x, double *p_stdev_x) {
+	
+	double _mean_x = 0., _mean_x_sq=0., _x = xmin;
+	double _piece;
+	std::complex<double> _wf;
+	for (std::complex<double> *pwf=wf, *pwfmax=wf+Nx; pwf<pwfmax; ++pwf)
+	{ 
+		_wf = *pwf; 
+		_x += dx;
+		_piece = _x * (std::conj(_wf) * _wf).real();
+		_mean_x += _piece;
+		_piece *= _x;
+		_mean_x_sq += _piece;
+	} _mean_x *= dx; _mean_x_sq *= dx;
+	double _stdev_x = _mean_x_sq - _mean_x*_mean_x;
+	*p_stdev_x = _stdev_x; *p_mean_x = _mean_x;
+
+	return EXIT_SUCCESS;
+}
+
+
+
+int Wavefunction_on_Box_1D::mean_and_stdev_x(
+		std::complex<double> *wf, double xmin, double *p_mean_x, double *p_stdev_x)
+{
+	return Wavefunction_on_Box_1D::mean_and_stdev_x(
+			wf, Nx, dx, xmin, p_mean_x, p_stdev_x);
+}
+
+
+
+int Wavefunction_on_Box_1D::stdev_x(
+		std::complex<double> *wf, size_t Nx, double dx, double xmin, 
+		double *p_stdev_x) 
+{
+	double _mean_x, _stdev_x;
+	int status = Wavefunction_on_Box_1D::mean_and_stdev_x(
+			wf, Nx, dx, xmin, &_mean_x, &_stdev_x);
+	if (status != EXIT_SUCCESS) { return EXIT_FAILURE; }
+	*p_stdev_x = _stdev_x;
+	return EXIT_SUCCESS;
+}
+
 
 
 int eval_ground_state_in_box_1d(
