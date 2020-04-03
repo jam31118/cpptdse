@@ -78,7 +78,8 @@ int Wavefunction_on_Box_1D::mean_and_stdev_x(
 		_piece *= _x;
 		_mean_x_sq += _piece;
 	} _mean_x *= dx; _mean_x_sq *= dx;
-	double _stdev_x = _mean_x_sq - _mean_x*_mean_x;
+	double _var_x = _mean_x_sq - _mean_x*_mean_x;
+	double _stdev_x = std::sqrt(_var_x);
 	*p_stdev_x = _stdev_x; *p_mean_x = _mean_x;
 
 	return EXIT_SUCCESS;
