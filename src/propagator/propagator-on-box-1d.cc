@@ -10,7 +10,7 @@ Propagator_on_Box_1D::Propagator_on_Box_1D() {}
 
 
 Propagator_on_Box_1D::Propagator_on_Box_1D(
-		size_t Nx, double dx, double *Vx, double hbar, double mass): 
+		size_t Nx, double dx, double *Vx, double hbar, double mass):
 	Nx(Nx), dx(dx), Vx(Vx), hbar(hbar), mass(mass) {
 
 	if (dx <= 0.) { throw "[ERROR] Negative `dx` found"; }
@@ -39,11 +39,20 @@ Propagator_on_Box_1D::Propagator_on_Box_1D(
 }
 
 
+//Propagator_on_Box_1D::Propagator_on_Box_1D(
+//		size_t Nx, double dx, double *Vx, double hbar, double mass): 
+//	Propagator_on_Box_1D(Nx, dx, Vx, NULL, hbar, mass) 
+//{
+//	Vx_imag = new double[Nx];
+//	set_to_zeros(Vx_imag, Nx);
+//}
+
 Propagator_on_Box_1D::~Propagator_on_Box_1D() {
 	delete [] U_forward;
 	delete [] U_backward;
 	delete [] M2;
 	delete [] M2ReH;
+//	delete [] Vx_imag;
 }
 
 
@@ -160,4 +169,54 @@ int Propagator_on_Box_1D::propagate_to_ground_state(
 }
 
 
+
+
+/**
+ * Definitions for `Propagator_on_Box_1D_with_imag_pot`
+ * */
+
+Propagator_on_Box_1D_with_imag_pot::Propagator_on_Box_1D_with_imag_pot(
+		size_t Nx, double dx, double *Vx, double *Vx_imag, 
+		double hbar, double mass): 
+	Propagator_on_Box_1D(Nx, dx, Vx, hbar, mass), Vx_imag(Vx_imag)
+{
+	M2ImV = new double[N_tridiag];
+	tridiag_mul_diag(M2, Vx_imag, M2ImV, Nx);
+}
+
+
+Propagator_on_Box_1D_with_imag_pot::~Propagator_on_Box_1D_with_imag_pot() {
+	delete [] M2ImV;
+}
+
+
+int Propagator_on_Box_1D_with_imag_pot::
+eval_time_evol_unitary_for_real_timestep(double dt) {
+	
+	// Construct unitary propagators
+	const double _half_dt_over_hbar = 0.5 * dt / hbar;
+	const double _minus_half_dt_over_hbar = -_half_dt_over_hbar;
+	std::complex<double> *pUf, *pUf_max, *pUb;
+	double *pM2, *pM2ReH, *pM2ImV;
+	double _M2, _minus_half_dt_over_hbar_M2ReH, _half_dt_over_hbar_M2ImV;
+ 
+	for (pUf=U_forward, pUf_max=U_forward+3*Nx, pUb=U_backward, 
+			pM2=M2, pM2ReH=M2ReH, pM2ImV=M2ImV;
+			pUf < pUf_max;
+			++pUf, ++pUb, ++pM2, ++pM2ReH, ++pM2ImV) {
+
+		_M2 = *pM2;
+		_minus_half_dt_over_hbar_M2ReH = _minus_half_dt_over_hbar * (*pM2ReH);
+		_half_dt_over_hbar_M2ImV = _half_dt_over_hbar * (*pM2ImV);
+		*pUf = {_M2 + _half_dt_over_hbar_M2ImV, _minus_half_dt_over_hbar_M2ReH};
+		*pUb = {_M2 - _half_dt_over_hbar_M2ImV, -_minus_half_dt_over_hbar_M2ReH};
+
+	}
+
+	// Set both ends of each time evol unitary tridiagonals
+	U_forward[3*Nx-1] = 0.0, U_backward[3*Nx-1] = 0.0;
+	U_forward[0] = 0.0, U_backward[0] = 0.0;
+
+	return EXIT_SUCCESS;
+}
 

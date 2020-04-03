@@ -17,7 +17,7 @@ int v1_add_c_mul_v2(type_v *v, type_v1 *v1, type_c c, type_v2 *v2, size_t N) {
 template <typename T>
 void print_array(T *a, size_t N) {
 	for (T *pT=a, *pTmax=a+N; pT < pTmax; ++pT) {
-		std::cout << *pT;
+		std::cout << *pT << " ";
 	} std::cout << std::endl;
 }
 
