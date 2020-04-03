@@ -23,7 +23,7 @@ def Settings( **kwargs ):
         '-I', TDSEINC, 
         '-I', MATRIX_INC,
         '-I', PARAM_INC,
-        '-DFIELD',
+        '-DIMAGPOT',
         ],
   }
 

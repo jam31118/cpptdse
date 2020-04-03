@@ -11,6 +11,7 @@
 #include "../../../include/array.h"
 
 
+
 #ifdef FIELD
 
 #include "../../../include/propagator/propagator-on-box-1d-under-field.h"
@@ -28,6 +29,43 @@ double A_func(double t) {
 }
 
 #endif // FIELD
+
+
+
+
+#ifdef IMAGPOT
+
+#include <cmath>
+int eval_imagpot_powered(
+		double *imagpot, size_t Nx, size_t Nwidth, double V0) {
+	if (V0 < 0) { return EXIT_FAILURE; }
+	if (Nx < (2*Nwidth+1)) { return EXIT_FAILURE; }
+	double *pimagpot = imagpot;
+	size_t n = 0; size_t ord = 7;
+
+	double double_Nwidth = Nwidth;
+	double double_grid_num;
+//		std::cout << ((double) Nwidth) << std::endl;
+//		std::cout <<  double_Nwidth << std::endl;
+	for ( ; n < Nwidth; ++n, ++pimagpot)
+	{ 
+		double_grid_num = (int)(n - (Nwidth - 1));
+//		std::cout << double_grid_num << double_Nwidth << std::endl;
+		*pimagpot = V0 * pow(double_grid_num / double_Nwidth, ord); 
+	}
+	for ( ; n < Nx - Nwidth; ++n, ++pimagpot)
+	{ *pimagpot = 0.; }
+	for ( ; n < Nx; ++n, ++pimagpot)
+	{ 
+		double_grid_num = (int)(Nx - Nwidth - n);
+		*pimagpot = V0 * pow(double_grid_num / double_Nwidth, ord); 
+	}
+	return EXIT_SUCCESS;
+}
+
+#endif // IMAGPOT
+
+
 
 
 int main() {
@@ -55,10 +93,26 @@ int main() {
 	double *Vx = new double[Nx];
 	set_to_zeros(Vx, Nx);
 
+
+#ifdef IMAGPOT
+	double *Vx_imag = new double[Nx];
+//	set_to_zeros(Vx_imag, Nx);
+	const size_t N_imagpot_width = param.get_int("imagpot-grid-num");
+	const double imagpot_ampl = param.get_double("imagpot-ampl");
+	if (EXIT_SUCCESS != eval_imagpot_powered(
+				Vx_imag, Nx, N_imagpot_width, imagpot_ampl)) {
+		std::cerr << "[ERROR] Failed to evaluate imaginary scalar potential\n";
+		return EXIT_FAILURE;
+	}
+#endif // IMAGPOT
+
+
 	// Construct a propagator object
 #ifdef FIELD
 	Propagator_on_Box_1D_under_field prop(Nx, dx, Vx, &A_func);
-#else // FIELD
+#elif IMAGPOT
+	Propagator_on_Box_1D_with_imag_pot prop(Nx, dx, Vx, Vx_imag);
+#else
 	Propagator_on_Box_1D prop(Nx, dx, Vx);
 #endif // FIELD
 
@@ -124,7 +178,9 @@ int main() {
 	} std::cout << "[ LOG ] COMPLETE: A propagation with real timestep\n";
 	
 
-	// Write to output file
+
+
+	//// Write to output file
 	//
 	std::string wf_t_file_name("wf_t.bin");
 	std::ofstream wf_t_file(wf_t_file_name, std::ios::binary);
@@ -136,6 +192,17 @@ int main() {
 	wf_t_file.close();	
 	std::cout << "[ LOG ] COMPLETE: Writing wavefunction to a file: " 
 		<< wf_t_file_name << std::endl; 
+
+
+	std::ofstream Vx_file("scalarpot_real.bin");
+	Vx_file.write((char *) Vx, Nx*sizeof(double));
+	Vx_file.close();
+
+#ifdef IMAGPOT
+	std::ofstream Vx_imag_file("scalarpot_imag.bin");
+	Vx_imag_file.write((char *) Vx_imag, Nx*sizeof(double));
+	Vx_imag_file.close();
+#endif // IMAGPOT
 
 #ifdef FIELD
 	std::ofstream vecpot_t_file("vecpot-t.bin");
@@ -152,6 +219,9 @@ int main() {
 	delete [] At;	
 #endif // FIELD
 	delete [] Vx;
+#ifdef IMAGPOT
+	delete [] Vx_imag;
+#endif // IMAGPOT
 	delete [] wf;
 
 	delete [] wf_t;

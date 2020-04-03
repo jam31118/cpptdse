@@ -1,8 +1,11 @@
-Nx int 81
-dx double 0.025
+Nx int 501
+dx double 0.2
 
-dt double 0.0125
-Nt int 801
+dt double 0.1
+Nt int 101
 
-#wf-t0-file string wf-t0.bin
+imagpot-grid-num int 50
+imagpot-ampl double 100.0
+
+wf-t0-file string wf-t0.bin
 
