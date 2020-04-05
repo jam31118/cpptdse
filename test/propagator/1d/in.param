@@ -1,8 +1,8 @@
-Nx int 501
-dx double 0.2
+Nx int 801
+dx double 0.025
 
-dt double 0.1
-Nt int 101
+dt double 0.0125
+Nt int 201
 
 imagpot-grid-num int 50
 imagpot-ampl double 100.0
