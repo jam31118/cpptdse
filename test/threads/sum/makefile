@@ -1,10 +1,10 @@
-include ../../var.mk
+include ../../../var.mk
 
-bins = threads
+bins = threads-sum
 
 all: $(bins)
 
-threads: threads.cc
+threads-sum: threads-sum.cc
 	$(CXX) -o $@ $< $(OPT_FLAGS) $(WARN_FLAGS) -lpthread
 
 clean:
