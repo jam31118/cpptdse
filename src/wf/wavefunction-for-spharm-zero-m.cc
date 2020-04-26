@@ -60,3 +60,24 @@ int Wavefunction_for_spharm_zero_m::eval_radial_arr(double *const rarr) {
 	return eval_radial_arr(rarr, Nr, dr);
 }
 
+
+
+
+#include <cmath>
+int eval_ground_state_of_sphbox_in_spharm_basis(
+		std::complex<double> *wf, size_t Nr, double dr, size_t Nl) 
+{
+	if (Nr < 2 || Nl < 1 || dr <= 0.) { return EXIT_FAILURE; }
+	const double rmax = (Nr+1) * dr;
+	const double norm_const = std::sqrt(2./rmax);
+	const double dphi = M_PI*dr/rmax;
+	double phi=0;
+	std::complex<double> *pwfmax = wf + Nr;
+	for (std::complex<double> *pwf=wf; pwf<pwfmax; ++pwf) {
+		phi += dphi;
+		*pwf = norm_const * std::sin(phi);
+	}
+	set_to_zeros(wf+Nr*1, Nr*(Nl-1));
+	return EXIT_SUCCESS;
+}
+

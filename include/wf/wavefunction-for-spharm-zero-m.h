@@ -24,4 +24,8 @@ public:
 	int eval_radial_arr(double *const rarr);
 };
 
+
+int eval_ground_state_of_sphbox_in_spharm_basis(
+		std::complex<double> *wf, size_t Nr, double dr, size_t Nl);
+
 #endif // _WAVEFUNCTION_FOR_SPHARM_ZERO_M_H_

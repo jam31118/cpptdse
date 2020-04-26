@@ -9,26 +9,6 @@
 
 
 
-#include <cmath>
-int eval_ground_state_of_sphbox_in_spharm_basis(
-		std::complex<double> *wf, size_t Nr, double dr, size_t Nl) 
-{
-	if (Nr < 2 || Nl < 1 || dr <= 0.) { return EXIT_FAILURE; }
-	const double rmax = (Nr+1) * dr;
-	const double norm_const = std::sqrt(2./rmax);
-	const double dphi = M_PI*dr/rmax;
-	double phi=0;
-	std::complex<double> *pwfmax = wf + Nr;
-	for (std::complex<double> *pwf=wf; pwf<pwfmax; ++pwf) {
-		phi += dphi;
-		*pwf = norm_const * std::sin(phi);
-	}
-	set_to_zeros(wf+Nr*1, Nr*(Nl-1));
-	return EXIT_SUCCESS;
-}
-
-
-
 int main() {
 
 	// Extract parameters from file
@@ -46,10 +26,12 @@ int main() {
 	const double dt = param->get_double("dt");
 
 
-
+	// Construct static potential
 	double *Vr = new double[Nr];
 	set_to_zeros(Vr, Nr);
 
+
+	// Construct a propagator
 	Propagator_for_spharm_zero_m *prop = NULL;
 	try { prop = new Propagator_for_spharm_zero_m(Nr, dr, Nl, Vr); }
 	catch (const char *mesg) {
@@ -59,25 +41,21 @@ int main() {
 	}
 
 	
+
 	// Prepare initial state
 	//
 	const size_t wf_length = prop->wf->length();
 	std::complex<double> *wf = new std::complex<double>[wf_length];
 	std::complex<double> *wf_max = wf + wf_length;
 	
-//	int stat = eval_ground_state_of_sphbox_in_spharm_basis(wf, Nr, dr, Nl);
-//	if (EXIT_SUCCESS != stat) {
-//		std::cerr << "[ERROR] Failed to evaluate ground state\n";
-//		return EXIT_FAILURE;
-//	}
-
+	// Evaluate initial state by iteration : propagation with imaginary time
 	set_to_randoms(wf, wf_length);
 	prop->propagate_to_ground_state(wf, dt, 10000, 1e-14, 1);
-
 
 	// Copy the initial wavefunction into a separate array
 	std::complex<double> *wf_t0 = new std::complex<double>[wf_length];
 	std::copy(wf, wf_max, wf_t0);
+
 
 
 	// Prepare storage for time-dependent wavefunction
@@ -140,6 +118,8 @@ int main() {
 	delete [] tarr;
 
 
+	// Free memory
+	//
 	delete [] wf_t_1d;
 	delete [] wf_t;
 	delete [] wf_t0;
