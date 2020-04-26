@@ -51,6 +51,7 @@ Propagator_for_spharm_zero_m::Propagator_for_spharm_zero_m(
 	for (double *pr=one_over_r_sq, *prmax=one_over_r_sq+Nr, rval=dr;
 			pr<prmax; ++pr, rval+=dr) { *pr = 1./(rval*rval); }
 	// Evaluate ReVl and M2ReVl for M2ReH = Kr + M2*ReVl
+	// where ReVl = ReVr + (hbar / (2mass)) * l * (l+1) / r^2
 	for (size_t il=0; il<Nl; ++il) {
 		const size_t l = il;  // should be modified for nonzero m
 		v1_add_c_mul_v2(Vr, one_over_r_sq, hbar_sq_over_2mass*l*(l+1), Vl, Nr);	

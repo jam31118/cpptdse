@@ -13,10 +13,12 @@ class Propagator_for_spharm_zero_m {
 	double hbar, mass;
 
 	size_t N_tridiag;
-	double *M2;
-	double **M2ReH;
 	double *M2ReH_1d;
 	std::complex<double> *U_1d, **U, *Uinv_1d, **Uinv;
+
+protected:
+	double *M2;
+	double **M2ReH;
 
 public:
 
