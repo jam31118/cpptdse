@@ -8,8 +8,12 @@
 int add(double *a, double *b, double *c, size_t N);
 
 template <typename type_v, typename type_v1, typename type_c, typename type_v2>
-int v1_add_c_mul_v2(type_v *v, type_v1 *v1, type_c c, type_v2 *v2, size_t N) {
-	type_v1 *pv1=v1; type_v2 *pv2=v2; type_v *pv=v, *pvmax=v+N;
+int v1_add_c_mul_v2(type_v *v, 
+		const type_v1 *v1, const type_c c, const type_v2 *v2, const size_t N) 
+{
+	const type_v1 *pv1=v1; 
+	const type_v2 *pv2=v2; 
+	type_v *pv=v, *const pvmax=v+N;
 	for (; pv<pvmax; ++pv, ++pv1, ++pv2) { *pv = (*pv1) + c * (*pv2); }
 	return EXIT_SUCCESS;
 }

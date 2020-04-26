@@ -6,7 +6,8 @@
 
 
 Propagator_for_spharm_zero_m::Propagator_for_spharm_zero_m(
-		size_t Nr, double dr, size_t Nl, double *Vr, double hbar, double mass): 
+		const size_t Nr, const double dr, const size_t Nl, const double *Vr, 
+		const double hbar, const double mass): 
 	Nr(Nr), dr(dr), Nl(Nl), Vr(Vr), hbar(hbar), mass(mass)
 {
 
@@ -54,7 +55,7 @@ Propagator_for_spharm_zero_m::Propagator_for_spharm_zero_m(
 	// where ReVl = ReVr + (hbar / (2mass)) * l * (l+1) / r^2
 	for (size_t il=0; il<Nl; ++il) {
 		const size_t l = il;  // should be modified for nonzero m
-		v1_add_c_mul_v2(Vr, one_over_r_sq, hbar_sq_over_2mass*l*(l+1), Vl, Nr);	
+		v1_add_c_mul_v2(Vl, Vr, hbar_sq_over_2mass*l*(l+1), one_over_r_sq, Nr);	
 		tridiag_mul_diag(M2, Vl, M2ReVl, Nr);
 		add(Kr, M2ReVl, M2ReH[il], N_tridiag);
 	}

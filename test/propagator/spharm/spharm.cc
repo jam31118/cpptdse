@@ -28,9 +28,15 @@ int main() {
 
 	// Construct static potential
 	double *Vr = new double[Nr];
+#ifdef COULOMB
+	const double Z = 1.;
+	for (double r=dr, *pVr=Vr, *const pVr_max=Vr+Nr; pVr < pVr_max; ++pVr, r+=dr)
+	{ *pVr = - Z / r; }
+#else
 	set_to_zeros(Vr, Nr);
+#endif
 
-
+	
 	// Construct a propagator
 	Propagator_for_spharm_zero_m *prop = NULL;
 	try { prop = new Propagator_for_spharm_zero_m(Nr, dr, Nl, Vr); }

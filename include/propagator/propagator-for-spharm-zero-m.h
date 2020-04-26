@@ -9,7 +9,7 @@ class Propagator_for_spharm_zero_m {
 	size_t Nr;
 	double dr;
 	size_t Nl;
-	double *Vr;
+	const double *Vr;
 	double hbar, mass;
 
 	size_t N_tridiag;
@@ -23,8 +23,8 @@ protected:
 public:
 
 	Propagator_for_spharm_zero_m(
-		size_t Nr, double dr, size_t Nl, double *Vr, 
-		double hbar=1., double mass=1.);
+		const size_t Nr, const double dr, const size_t Nl, const double *Vr, 
+		const double hbar=1., const double mass=1.);
 	~Propagator_for_spharm_zero_m();
 	int eval_time_evol_unitary_for_real_timestep(double dt);
 	int eval_time_evol_unitary_for_imag_timestep(
