@@ -65,11 +65,14 @@ int main() {
 	std::complex<double> *wf = new std::complex<double>[wf_length];
 	std::complex<double> *wf_max = wf + wf_length;
 	
-	int stat = eval_ground_state_of_sphbox_in_spharm_basis(wf, Nr, dr, Nl);
-	if (EXIT_SUCCESS != stat) {
-		std::cerr << "[ERROR] Failed to evaluate ground state\n";
-		return EXIT_FAILURE;
-	}
+//	int stat = eval_ground_state_of_sphbox_in_spharm_basis(wf, Nr, dr, Nl);
+//	if (EXIT_SUCCESS != stat) {
+//		std::cerr << "[ERROR] Failed to evaluate ground state\n";
+//		return EXIT_FAILURE;
+//	}
+
+	set_to_randoms(wf, wf_length);
+	prop->propagate_to_ground_state(wf, dt, 10000, 1e-14, 1);
 
 
 	// Copy the initial wavefunction into a separate array
@@ -77,12 +80,13 @@ int main() {
 	std::copy(wf, wf_max, wf_t0);
 
 
-
 	// Prepare storage for time-dependent wavefunction
 	// 
 	std::complex<double> *wf_t_1d = new std::complex<double>[Nt*wf_length];
 	std::complex<double> **wf_t = new std::complex<double>*[Nt];
 	set_2d_view_of_1d(wf_t, wf_t_1d, Nt, Nr);
+
+
 
 
 	//// Propagate wavefunction
@@ -97,6 +101,8 @@ int main() {
 		tarr[it+1] = t;
 		std::copy(wf, wf_max, wf_t[it+1]);
 	} std::cout << "[ LOG ] COMPLETE: A propagation with real timestep\n";
+
+
 
 
 	//// Save data into files

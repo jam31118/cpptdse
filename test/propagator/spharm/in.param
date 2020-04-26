@@ -1,7 +1,7 @@
-Nr long 31
-dr double 0.2
+Nr long 121
+dr double 0.05
 Nl long 1
 
-dt double 0.1
-Nt long 101
+dt double 0.05
+Nt long 201
 

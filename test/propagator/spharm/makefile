@@ -8,9 +8,12 @@ bins = spharm
 
 all: $(bins)
 
-spharm: spharm.cc
+spharm: spharm.cc libtdse.so
 	$(CXX) -o $@ $< $(OPT_FLAGS) $(WARN_FLAGS) \
 		$(TDSE_LIB_FLAGS) $(PARAM_INC_FLAGS) $(PARAM_LIB_FLAGS)
+
+libtdse.so:
+	$(MAKE) -C ../../../src
 
 clean: 
 	$(RM) $(bins)
