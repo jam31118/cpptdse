@@ -136,30 +136,8 @@ int Propagator_for_spharm_zero_m
 ::eval_time_evol_unitary_for_real_timestep(double dt) {
 
 	for (size_t il=0; il<Nl; ++il) 
-	{
-		eval_time_evol_unitary_for_real_timestep_l(il, dt);
-	}
-		
-//	// Construct unitary propagators
-//	const double _c = - 0.5 * dt / hbar;
-//	double *const pM2max = M2 + N_tridiag;
-//	for (size_t il=0; il<Nl; ++il) 
-//	{
-//		double *pM2, *pM2ReHl;
-//		std::complex<double> *Ul=U[il], *Ul_inv=Uinv[il];
-//		std::complex<double> *pUl, *pUl_inv;
-//		for (pUl=Ul, pUl_inv=Ul_inv, pM2=M2, pM2ReHl=M2ReH[il];
-//				pM2 < pM2max;
-//				++pUl, ++pUl_inv, ++pM2, ++pM2ReHl) 
-//		{
-//			const double _M2 = *pM2;
-//			const double _c_M2ReHl = _c * (*pM2ReHl);
-//			*pUl = {_M2, _c_M2ReHl};
-//			*pUl_inv = {_M2, -_c_M2ReHl};
-//		}
-//		Ul[0] = 0., Ul_inv[0] = 0.;
-//		Ul[N_tridiag-1] = 0., Ul_inv[N_tridiag-1] = 0.;
-//	}
+	{ eval_time_evol_unitary_for_real_timestep_l(il, dt); }
+
 	return EXIT_SUCCESS;
 }
 
@@ -256,7 +234,8 @@ int Propagator_for_spharm_zero_m::propagate_to_ground_state(
 		const size_t Nt_max, const double stop_thres, const size_t nonzero_l_num) {
 	
 
-
+  //// Evaluate propagator for imaginary time
+	//
 	double *Uimag_1d, **Uimag, *Uimag_inv_1d, **Uimag_inv;
 	Uimag_1d = new double[nonzero_l_num*N_tridiag];
 	Uimag = new double*[nonzero_l_num];
@@ -290,11 +269,8 @@ int Propagator_for_spharm_zero_m::propagate_to_ground_state(
 
 	double norm_diff;
 
-
 	//// Propagate
 	//
-//	eval_time_evol_unitary_for_imag_timestep(dt, nonzero_l_num);
-
 	std::complex<double> *wf_mid = new std::complex<double>[Nr];
 	size_t it;
 	for (it=0; it<Nt_max; ++it) {
@@ -328,12 +304,10 @@ int Propagator_for_spharm_zero_m::propagate_to_ground_state(
 	delete [] nonzero_wf_diff;
 
 
-
 	delete [] Uimag_inv;
 	delete [] Uimag_inv_1d;
 	delete [] Uimag;
 	delete [] Uimag_1d;
-
 
 	return EXIT_SUCCESS;
 }
