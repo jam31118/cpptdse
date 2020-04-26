@@ -27,8 +27,11 @@ public:
 		const double hbar=1., const double mass=1.);
 	~Propagator_for_spharm_zero_m();
 	int eval_time_evol_unitary_for_real_timestep(double dt);
+	int eval_time_evol_unitary_for_real_timestep_l(size_t il, double dt);
 	int eval_time_evol_unitary_for_imag_timestep(
 			double imag_dt, size_t nonzero_l_num);
+	int eval_time_evol_unitary_for_imag_timestep_double(
+		double imag_dt, size_t nonzero_l_num, double **Uimag, double **Uimag_inv);
 	int propagate(
 			std::complex<double> *const wf, const double dt, const size_t Nt=1);
 	int propagate_to_ground_state(
