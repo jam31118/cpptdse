@@ -1,11 +1,8 @@
 
-#TDSEHOME = getenv('TDSEHOME')
 TDSEHOME = __file__
 from os.path import join, exists
-#TDSEHOME = "/home/ahn/Dropbox/tdse/numerical/package/tdse"
 assert exists(TDSEHOME)
 TDSEINC = join(TDSEHOME, "include")
-#assert exists(TDSEINC)
 
 from os import getenv
 MATRIXHOME = getenv('MATRIXHOME')
@@ -23,7 +20,7 @@ def Settings( **kwargs ):
         '-I', TDSEINC, 
         '-I', MATRIX_INC,
         '-I', PARAM_INC,
-        '-DIMAGPOT',
+#        '-DCOULOMB',  # add this flag when testing Coulomb potential test code
         ],
   }
 
