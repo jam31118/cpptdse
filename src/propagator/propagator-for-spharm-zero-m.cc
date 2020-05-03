@@ -6,7 +6,8 @@
 
 
 Propagator_for_spharm_zero_m::Propagator_for_spharm_zero_m(
-		size_t Nr, double dr, size_t Nl, double *Vr, double hbar, double mass): 
+		const size_t Nr, const double dr, const size_t Nl, const double *Vr, 
+		const double hbar, const double mass): 
 	Nr(Nr), dr(dr), Nl(Nl), Vr(Vr), hbar(hbar), mass(mass)
 {
 
@@ -51,9 +52,10 @@ Propagator_for_spharm_zero_m::Propagator_for_spharm_zero_m(
 	for (double *pr=one_over_r_sq, *prmax=one_over_r_sq+Nr, rval=dr;
 			pr<prmax; ++pr, rval+=dr) { *pr = 1./(rval*rval); }
 	// Evaluate ReVl and M2ReVl for M2ReH = Kr + M2*ReVl
+	// where ReVl = ReVr + (hbar / (2mass)) * l * (l+1) / r^2
 	for (size_t il=0; il<Nl; ++il) {
 		const size_t l = il;  // should be modified for nonzero m
-		v1_add_c_mul_v2(Vr, one_over_r_sq, hbar_sq_over_2mass*l*(l+1), Vl, Nr);	
+		v1_add_c_mul_v2(Vl, Vr, hbar_sq_over_2mass*l*(l+1), one_over_r_sq, Nr);	
 		tridiag_mul_diag(M2, Vl, M2ReVl, Nr);
 		add(Kr, M2ReVl, M2ReH[il], N_tridiag);
 	}
@@ -61,6 +63,28 @@ Propagator_for_spharm_zero_m::Propagator_for_spharm_zero_m(
 	delete [] M2ReVl;
 	delete [] Vl;
 	delete [] Kr;
+
+
+	//// Initialize time-evolution opetator's real part
+	// 
+	// NOTE. Real part of the Crank-Nicolson time-evolution operators are M2.
+	// 
+	double *const pM2max = M2 + N_tridiag;
+	for (size_t il=0; il<Nl; ++il) 
+	{
+		double *pM2;
+		std::complex<double> *Ul=U[il], *Ul_inv=Uinv[il];
+		std::complex<double> *pUl, *pUl_inv;
+		for (pUl=Ul, pUl_inv=Ul_inv, pM2=M2; pM2 < pM2max; ++pUl, ++pUl_inv, ++pM2)
+		{
+			const double _M2 = *pM2;
+			(*pUl).real(_M2);
+			(*pUl_inv).real(_M2);
+		}
+		Ul[0] = 0., Ul_inv[0] = 0.;
+		Ul[N_tridiag-1] = 0., Ul_inv[N_tridiag-1] = 0.;
+	}
+
 }
 
 
@@ -83,30 +107,37 @@ Propagator_for_spharm_zero_m::~Propagator_for_spharm_zero_m() {
 
 
 
+int Propagator_for_spharm_zero_m
+::eval_time_evol_unitary_for_real_timestep_l(size_t il, double dt) {
+
+	const double _c = - 0.5 * dt / hbar;
+	std::complex<double> *pUl_max = U[il] + N_tridiag;
+
+	double *pM2ReHl;
+	std::complex<double> *Ul=U[il], *Ul_inv=Uinv[il];
+	std::complex<double> *pUl, *pUl_inv;
+	for (pUl=Ul, pUl_inv=Ul_inv, pM2ReHl=M2ReH[il];
+			pUl < pUl_max;
+			++pUl, ++pUl_inv, ++pM2ReHl) 
+	{
+		const double _c_M2ReHl = _c * (*pM2ReHl);
+		(*pUl).imag(_c_M2ReHl);
+		(*pUl_inv).imag(-_c_M2ReHl);
+	}
+	Ul[0] = 0., Ul_inv[0] = 0.;
+	Ul[N_tridiag-1] = 0., Ul_inv[N_tridiag-1] = 0.;
+
+	return EXIT_SUCCESS;
+}
+
+
 
 int Propagator_for_spharm_zero_m
 ::eval_time_evol_unitary_for_real_timestep(double dt) {
-		
-	// Construct unitary propagators
-	const double _c = - 0.5 * dt / hbar;
-	double *const pM2max = M2 + N_tridiag;
+
 	for (size_t il=0; il<Nl; ++il) 
-	{
-		double *pM2, *pM2ReHl;
-		std::complex<double> *Ul=U[il], *Ul_inv=Uinv[il];
-		std::complex<double> *pUl, *pUl_inv;
-		for (pUl=Ul, pUl_inv=Ul_inv, pM2=M2, pM2ReHl=M2ReH[il];
-				pM2 < pM2max;
-				++pUl, ++pUl_inv, ++pM2, ++pM2ReHl) 
-		{
-			const double _M2 = *pM2;
-			const double _c_M2ReHl = _c * (*pM2ReHl);
-			*pUl = {_M2, _c_M2ReHl};
-			*pUl_inv = {_M2, -_c_M2ReHl};
-		}
-		Ul[0] = 0., Ul_inv[0] = 0.;
-		Ul[N_tridiag-1] = 0., Ul_inv[N_tridiag-1] = 0.;
-	}
+	{ eval_time_evol_unitary_for_real_timestep_l(il, dt); }
+
 	return EXIT_SUCCESS;
 }
 
@@ -143,6 +174,40 @@ int Propagator_for_spharm_zero_m
 
 
 
+
+
+int Propagator_for_spharm_zero_m
+::eval_time_evol_unitary_for_imag_timestep_double(
+		double imag_dt, size_t nonzero_l_num, double **Uimag, double **Uimag_inv) 
+{
+		
+	// Construct unitary propagators
+	const double _c = - 0.5 * imag_dt / hbar;
+	double *const pM2max = M2 + N_tridiag;
+	for (size_t il=0; il<nonzero_l_num; ++il) 
+	{
+		double *pM2, *pM2ReHl;
+		double *Ul=Uimag[il], *Ul_inv=Uimag_inv[il];
+		double *pUl, *pUl_inv;
+		for (pUl=Ul, pUl_inv=Ul_inv, pM2=M2, pM2ReHl=M2ReH[il];
+				pM2 < pM2max;
+				++pUl, ++pUl_inv, ++pM2, ++pM2ReHl) 
+		{
+			const double _M2 = *pM2;
+			const double _c_M2ReHl = _c * (*pM2ReHl);
+			*pUl = _M2 + _c_M2ReHl;
+			*pUl_inv = _M2 -_c_M2ReHl;
+		}
+		Ul[0] = 0., Ul_inv[0] = 0.;
+		Ul[N_tridiag-1] = 0., Ul_inv[N_tridiag-1] = 0.;
+	}
+	return EXIT_SUCCESS;
+}
+
+
+
+
+
 int Propagator_for_spharm_zero_m::propagate(
 		std::complex<double> *const wf, const double dt, const size_t Nt) 
 {
@@ -168,6 +233,22 @@ int Propagator_for_spharm_zero_m::propagate_to_ground_state(
 		std::complex<double> *const wf, const double dt,
 		const size_t Nt_max, const double stop_thres, const size_t nonzero_l_num) {
 	
+
+  //// Evaluate propagator for imaginary time
+	//
+	double *Uimag_1d, **Uimag, *Uimag_inv_1d, **Uimag_inv;
+	Uimag_1d = new double[nonzero_l_num*N_tridiag];
+	Uimag = new double*[nonzero_l_num];
+	set_2d_view_of_1d(Uimag, Uimag_1d, nonzero_l_num, N_tridiag);
+	Uimag_inv_1d = new double[nonzero_l_num*N_tridiag];
+	Uimag_inv = new double*[nonzero_l_num];
+	set_2d_view_of_1d(Uimag_inv, Uimag_inv_1d, nonzero_l_num, N_tridiag);
+
+	eval_time_evol_unitary_for_imag_timestep_double(
+			dt, nonzero_l_num, Uimag, Uimag_inv);
+	
+
+
 	const size_t nonzero_wf_length = nonzero_l_num * Nr;
 	std::complex<double> *const nonzero_wf_max = wf + nonzero_wf_length;
 	const size_t zero_l_num = Nl - nonzero_l_num;
@@ -178,9 +259,9 @@ int Propagator_for_spharm_zero_m::propagate_to_ground_state(
 	set_to_zeros(wf + nonzero_wf_length, zero_wf_length);
 
 
-	std::complex<double> *const nonzero_wf_prev 
-		= new std::complex<double>[nonzero_wf_length];
 	Wavefunction_for_spharm_zero_m::normalize(wf, Nr, dr, nonzero_l_num);
+	std::complex<double> *const nonzero_wf_prev	
+		= new std::complex<double>[nonzero_wf_length];
 	std::copy(wf, nonzero_wf_max, nonzero_wf_prev);
 
 	std::complex<double> *const nonzero_wf_diff
@@ -188,19 +269,16 @@ int Propagator_for_spharm_zero_m::propagate_to_ground_state(
 
 	double norm_diff;
 
-
 	//// Propagate
 	//
-	eval_time_evol_unitary_for_imag_timestep(dt, nonzero_l_num);
-
 	std::complex<double> *wf_mid = new std::complex<double>[Nr];
 	size_t it;
 	for (it=0; it<Nt_max; ++it) {
 
 		// Propagate one step with an imaginary time step
 		for (size_t il=0; il<nonzero_l_num; ++il) {
-			tridiag_forward(U[il], wf+il*Nl, wf_mid, Nr);	
-			tridiag_backward(Uinv[il], wf+il*Nl, wf_mid, Nr);
+			tridiag_forward(Uimag[il], wf+il*Nl, wf_mid, Nr);	
+			tridiag_backward(Uimag_inv[il], wf+il*Nl, wf_mid, Nr);
 		}
 
 		Wavefunction_for_spharm_zero_m::normalize(wf, Nr, dr, nonzero_l_num);
@@ -221,8 +299,15 @@ int Propagator_for_spharm_zero_m::propagate_to_ground_state(
 		return_code = EXIT_FAILURE;  
 	}
 
+
 	delete [] nonzero_wf_prev;
 	delete [] nonzero_wf_diff;
+
+
+	delete [] Uimag_inv;
+	delete [] Uimag_inv_1d;
+	delete [] Uimag;
+	delete [] Uimag_1d;
 
 	return EXIT_SUCCESS;
 }

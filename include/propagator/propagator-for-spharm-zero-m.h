@@ -9,24 +9,29 @@ class Propagator_for_spharm_zero_m {
 	size_t Nr;
 	double dr;
 	size_t Nl;
-	double *Vr;
+	const double *Vr;
 	double hbar, mass;
 
 	size_t N_tridiag;
-	double *M2;
-	double **M2ReH;
 	double *M2ReH_1d;
 	std::complex<double> *U_1d, **U, *Uinv_1d, **Uinv;
+
+protected:
+	double *M2;
+	double **M2ReH;
 
 public:
 
 	Propagator_for_spharm_zero_m(
-		size_t Nr, double dr, size_t Nl, double *Vr, 
-		double hbar=1., double mass=1.);
+		const size_t Nr, const double dr, const size_t Nl, const double *Vr, 
+		const double hbar=1., const double mass=1.);
 	~Propagator_for_spharm_zero_m();
 	int eval_time_evol_unitary_for_real_timestep(double dt);
+	int eval_time_evol_unitary_for_real_timestep_l(size_t il, double dt);
 	int eval_time_evol_unitary_for_imag_timestep(
 			double imag_dt, size_t nonzero_l_num);
+	int eval_time_evol_unitary_for_imag_timestep_double(
+		double imag_dt, size_t nonzero_l_num, double **Uimag, double **Uimag_inv);
 	int propagate(
 			std::complex<double> *const wf, const double dt, const size_t Nt=1);
 	int propagate_to_ground_state(

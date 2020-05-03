@@ -5,7 +5,13 @@
 #include "param.h"
 
 #include "../../../include/array.h"
+
+#ifdef COULOMB
+#include "../../../include/propagator/\
+propagator-for-spharm-zero-m-with-couloub-like-pot.h"
+#else // COULOMB
 #include "../../../include/propagator/propagator-for-spharm-zero-m.h"
+#endif // COULOMB
 
 
 
@@ -28,10 +34,27 @@ int main() {
 
 	// Construct static potential
 	double *Vr = new double[Nr];
+#ifdef COULOMB
+	const double Z = 1.;
+	for (double r=dr, *pVr=Vr, *const pVr_max=Vr+Nr; pVr < pVr_max; ++pVr, r+=dr)
+	{ *pVr = - Z / r; }
+#else
 	set_to_zeros(Vr, Nr);
+#endif
 
-
-	// Construct a propagator
+	
+	//// Construct a propagator
+	//
+#ifdef COULOMB
+	Propagator_for_spharm_zero_m_with_coulomb_like_pot *prop = NULL;
+	try { 
+		prop = new Propagator_for_spharm_zero_m_with_coulomb_like_pot(
+				Nr, dr, Nl, Vr, Z);	
+	} catch (...) {
+		std::cerr << "[ERROR] Failed to construct propagator\n";
+		return EXIT_FAILURE;
+	}
+#else // COULOMB
 	Propagator_for_spharm_zero_m *prop = NULL;
 	try { prop = new Propagator_for_spharm_zero_m(Nr, dr, Nl, Vr); }
 	catch (const char *mesg) {
@@ -39,6 +62,7 @@ int main() {
 		std::cerr << "[ERROR] '" << mesg << "'\n";
 		return EXIT_FAILURE;
 	}
+#endif // COULOMB
 
 	
 
